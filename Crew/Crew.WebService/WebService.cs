@@ -28,7 +28,9 @@ namespace Crew.WebService
                 .Where(endpoint => endpoint.Protocol.Equals(EndpointProtocol.Http) ||
                                    endpoint.Protocol.Equals(EndpointProtocol.Https))
                 .Select(endpoint => new ServiceInstanceListener(
-                    serviceContext => new OwinComunicationListener("api", new Startup(), serviceContext)));
+                    serviceContext => new OwinComunicationListener("api", 
+                                                                    new Startup(), 
+                                                                    serviceContext)));
         }
 
         /// <summary>

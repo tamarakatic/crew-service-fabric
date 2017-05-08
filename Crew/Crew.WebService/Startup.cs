@@ -11,14 +11,11 @@ namespace Crew.WebService
         {
             var config = new HttpConfiguration();
             config.MapHttpAttributeRoutes();
-            ConfigureFormatters(config.Formatters);
+            config.Formatters.JsonFormatter.
+                SupportedMediaTypes.
+                Add(new MediaTypeHeaderValue("text/html"));
 
             appBuilder.UseWebApi(config);
-        }
-
-        private void ConfigureFormatters(MediaTypeFormatterCollection formatterCollection)
-        {
-            formatterCollection.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
         }
     }
 }
