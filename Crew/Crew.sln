@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "Crew", "Crew\Crew.sfproj", "{391CC320-478D-4A0B-A3C0-9A1D578541EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crew.WebService", "Crew.WebService\Crew.WebService.csproj", "{6F6759F3-FD28-4EDB-BDFE-1A9F1E21520E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Debug|x64.ActiveCfg = Debug|x64
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Debug|x64.Build.0 = Debug|x64
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Debug|x64.Deploy.0 = Debug|x64
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Release|x64.ActiveCfg = Release|x64
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Release|x64.Build.0 = Release|x64
+		{391CC320-478D-4A0B-A3C0-9A1D578541EF}.Release|x64.Deploy.0 = Release|x64
+		{6F6759F3-FD28-4EDB-BDFE-1A9F1E21520E}.Debug|x64.ActiveCfg = Debug|x64
+		{6F6759F3-FD28-4EDB-BDFE-1A9F1E21520E}.Debug|x64.Build.0 = Debug|x64
+		{6F6759F3-FD28-4EDB-BDFE-1A9F1E21520E}.Release|x64.ActiveCfg = Release|x64
+		{6F6759F3-FD28-4EDB-BDFE-1A9F1E21520E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
