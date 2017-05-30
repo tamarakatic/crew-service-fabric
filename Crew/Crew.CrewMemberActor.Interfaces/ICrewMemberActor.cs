@@ -9,5 +9,6 @@ namespace Crew.CrewMemberActor.Interfaces
     {
         Task<KeyValuePair<float, float>> GetLatestLocationAsync();
         Task SetLocationAsync(DateTime timestamp, float latitude, float longitude);
+        Task<DateTime?> GetLastReportTime();
     }
 }

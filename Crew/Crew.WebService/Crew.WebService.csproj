@@ -110,7 +110,7 @@
     <Compile Include="IOwinAppBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="TrackerController.cs" />
+    <Compile Include="Controller\TrackerController.cs" />
     <Compile Include="WebService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ServiceEventSource.cs" />
@@ -126,6 +126,9 @@
       <Project>{c6d250ff-b85e-4b8d-bc38-fe74b59b6dfa}</Project>
       <Name>Crew.Tracker.Interfaces</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

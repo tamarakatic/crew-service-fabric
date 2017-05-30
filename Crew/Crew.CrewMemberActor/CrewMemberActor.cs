@@ -22,6 +22,9 @@ namespace Crew.CrewMemberActor
     [StatePersistence(StatePersistence.Persisted)]
     internal class CrewMemberActor : Actor, ICrewMemberActor
     {
+        public String Name { get; set; }
+        public Enum Status { get; set; }
+
         [DataContract]
         internal sealed class LocationAtTime
         {
@@ -65,6 +68,13 @@ namespace Crew.CrewMemberActor
                 .Select(x => new KeyValuePair<float, float>(x.Latitude, x.Longitude))
                 .FirstOrDefault();
             return location;
+        }
+
+        public async Task<DateTime?> GetLastReportTime()
+        {
+            var state = await StateManager.GetStateAsync<CrewState>("State");
+
+            return state.LocationHistory.Last().Timestamp;
         }
 
         public async Task SetLocationAsync(DateTime timestamp, float latitude, float longitude)

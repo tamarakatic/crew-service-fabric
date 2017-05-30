@@ -65,21 +65,16 @@ namespace Crew.StatefulTracker
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var timestamps = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, DateTime>>("timestamps");
                 var timestamp = DateTime.UtcNow;
 
-                var crewId = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("crewId");
-                var crewActorId = await crewId.GetOrAddAsync(tx, location.CrewId, ActorId.CreateRandom());
+                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
+                var crewActorId = await actorDict.GetOrAddAsync(tx, location.CrewId, ActorId.CreateRandom());
 
                 await CrewConnectionFactory.GetCrewMemberActor(crewActorId)
                     .SetLocationAsync(timestamp, 
                                       location.Latitude,
                                       location.Longitude);
 
-                await timestamps.AddOrUpdateAsync(tx,
-                                                  location.CrewId,
-                                                  DateTime.UtcNow,
-                                                  (guid, time) => timestamp);
                 await tx.CommitAsync();
             }
         }
@@ -88,9 +83,9 @@ namespace Crew.StatefulTracker
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var crewId = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("crewId");
+                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
 
-                var crewActorId = await crewId.TryGetValueAsync(tx, crewIdGuid);
+                var crewActorId = await actorDict.TryGetValueAsync(tx, crewIdGuid);
                 if (!crewActorId.HasValue)
                     return null;
 
@@ -103,11 +98,16 @@ namespace Crew.StatefulTracker
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var timestamps = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, DateTime>>("timestamps");
-                var timestamp = await timestamps.TryGetValueAsync(tx, crewId);
-                await tx.CommitAsync();
+                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
 
-                return timestamp.HasValue ? (DateTime?)timestamp.Value : null;
+                var crewActorId = await actorDict.TryGetValueAsync(tx, crewId);
+                if (!crewActorId.HasValue)
+                    return null;
+
+                var crew = CrewConnectionFactory.GetCrewMemberActor(crewActorId.Value);
+                var timestamp = crew.GetLastReportTime();
+
+                return await timestamp;
             }
         }
     }

@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Crew.CrewMemberActor\Crew.CrewMemberActor.csproj" />
     <ProjectReference Include="..\Crew.StatefulTracker\Crew.StatefulTracker.csproj" />
+    <ProjectReference Include="..\Crew.WebApplication\Crew.WebApplication.csproj" />
     <ProjectReference Include="..\Crew.WebService\Crew.WebService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
