@@ -11,13 +11,14 @@ using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Crew = Crew.CrewMemberActor.Interfaces.Crew;
 
 namespace Crew.StatefulTracker
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class StatefulTracker : StatefulService, ILocationReporter, ILocationViewer
+    internal sealed class StatefulTracker : StatefulService, ILocationReporter, ILocationViewer, Tracker.Interfaces.ICrew
     {
         public StatefulTracker(StatefulServiceContext context)
             : base(context)
@@ -61,25 +62,55 @@ namespace Crew.StatefulTracker
             }
         }
 
+        public async Task CreateCrew(CrewMemberActor.Interfaces.Crew crew)
+        {
+            using (var tx = StateManager.CreateTransaction())
+            {
+                var actorDictionary = await StateManager.GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.GetOrAddAsync(tx, crew.Name, ActorId.CreateRandom());
+
+                await CrewConnectionFactory
+                    .GetCrewMemberActor(crewActorId)
+                    .CreateCrewAsync(crew);
+
+                await tx.CommitAsync();
+            }
+        }
+
         public async Task ReportLocation(Location location)
         {
             using (var tx = StateManager.CreateTransaction())
             {
                 var timestamp = DateTime.UtcNow;
 
-                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
-                var crewActorId = await actorDict.GetOrAddAsync(tx, location.CrewId, ActorId.CreateRandom());
+                var actorDictionary = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.GetOrAddAsync(tx, location.CrewId, ActorId.CreateRandom());
 
                 await CrewConnectionFactory.GetCrewMemberActor(crewActorId)
-                    .SetLocationAsync(timestamp, 
-                                      location.Latitude,
-                                      location.Longitude);
+                    .SetLocationAsync(new CrewLocation(location.Longitude, location.Latitude, DateTime.Now)); 
 
                 await tx.CommitAsync();
             }
         }
 
-        public async Task<KeyValuePair<float, float>?> GetLastCrewLocation(Guid crewIdGuid)
+        public async  Task<CrewMemberActor.Interfaces.Crew> GetCrewByName(string crewName)
+        {
+            using (var tx = StateManager.CreateTransaction())
+            {
+                var actorDicitonary = await StateManager
+                    .GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorName = await actorDicitonary.TryGetValueAsync(tx, crewName);
+
+                if (!crewActorName.HasValue)
+                    return null;
+
+                var crew = CrewConnectionFactory.GetCrewMemberActor(crewActorName.Value);
+                return await crew.GetCrewByName();
+
+            }
+        }
+
+        public async Task<CrewLocation> GetLastCrewLocation(Guid crewIdGuid)
         {
             using (var tx = StateManager.CreateTransaction())
             {

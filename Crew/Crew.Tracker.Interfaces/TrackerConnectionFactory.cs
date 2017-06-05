@@ -17,5 +17,10 @@ namespace Crew.Tracker.Interfaces
         {
             return ServiceProxy.Create<ILocationViewer>(LocationReporterServiceUrl, new ServicePartitionKey(0));
         }
+
+        public static ICrew CreateCrew()
+        {
+            return ServiceProxy.Create<ICrew>(LocationReporterServiceUrl, new ServicePartitionKey(0));
+        }
     }
 }

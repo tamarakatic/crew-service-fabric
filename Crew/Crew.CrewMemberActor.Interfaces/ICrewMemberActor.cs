@@ -7,8 +7,10 @@ namespace Crew.CrewMemberActor.Interfaces
 {
     public interface ICrewMemberActor : IActor
     {
-        Task<KeyValuePair<float, float>> GetLatestLocationAsync();
-        Task SetLocationAsync(DateTime timestamp, float latitude, float longitude);
+        Task<CrewLocation> GetLatestLocationAsync();
+        Task SetLocationAsync(CrewLocation location);
         Task<DateTime?> GetLastReportTime();
+        Task CreateCrewAsync(Crew crew);
+        Task<Crew> GetCrewByName();
     }
 }

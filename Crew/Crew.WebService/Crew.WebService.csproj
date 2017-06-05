@@ -122,6 +122,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Crew.CrewMemberActor.Interfaces\Crew.CrewMemberActor.Interfaces.csproj">
+      <Project>{7854a05b-f050-4970-a352-ea3ef45b48a4}</Project>
+      <Name>Crew.CrewMemberActor.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Crew.Tracker.Interfaces\Crew.Tracker.Interfaces.csproj">
       <Project>{c6d250ff-b85e-4b8d-bc38-fe74b59b6dfa}</Project>
       <Name>Crew.Tracker.Interfaces</Name>

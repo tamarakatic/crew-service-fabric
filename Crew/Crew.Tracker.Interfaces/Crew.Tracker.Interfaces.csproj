@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICrew.cs" />
     <Compile Include="ILocation.cs" />
     <Compile Include="ILocationReporter.cs" />
     <Compile Include="ILocationViewer.cs" />
@@ -91,6 +92,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Crew.CrewMemberActor.Interfaces\Crew.CrewMemberActor.Interfaces.csproj">
+      <Project>{7854a05b-f050-4970-a352-ea3ef45b48a4}</Project>
+      <Name>Crew.CrewMemberActor.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

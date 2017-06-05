@@ -8,6 +8,7 @@ using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Actors.Client;
 using Crew.CrewMemberActor.Interfaces;
+using Crew = Crew.CrewMemberActor.Interfaces.Crew;
 
 namespace Crew.CrewMemberActor
 {
@@ -22,26 +23,32 @@ namespace Crew.CrewMemberActor
     [StatePersistence(StatePersistence.Persisted)]
     internal class CrewMemberActor : Actor, ICrewMemberActor
     {
-        public String Name { get; set; }
-        public Enum Status { get; set; }
+        //[DataContract]
+        //internal sealed class CrewState
+        //{
+        //    [DataMember]
+        //    public string Name { get; set; }
 
-        [DataContract]
-        internal sealed class LocationAtTime
-        {
-            [DataMember]
-            public DateTime Timestamp { get; set; }
-            [DataMember]
-            public float Latitude { get; set; }
-            [DataMember]
-            public float Longitude { get; set; }
-        }
+        //    [DataMember]
+        //    public string Status { get; set; }
 
-        [DataContract]
-        internal sealed class CrewState
-        {
-            [DataMember]
-            public List<LocationAtTime> LocationHistory { get; set; }
-        }
+        //    public CrewLocation Location { get; set; }
+
+        //    public List<Member> Members { get; set; }
+
+        //    public List<Assignment> Assignments { get; set; }
+
+        //    public List<Vehicle> Vehicles { get; set; }
+
+        //    public List<Company> Companies { get; set; }
+        //}
+
+        //[DataContract]
+        //internal sealed class CrewState
+        //{
+        //    [DataMember]
+        //    public List<LocationAtTime> LocationHistory { get; set; }
+        //}
         /// <summary>
         /// Initializes a new instance of CrewMemberActor
         /// </summary>
@@ -56,36 +63,49 @@ namespace Crew.CrewMemberActor
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
-            var state = await StateManager.TryGetStateAsync<CrewState>("State");
+            var state = await StateManager.TryGetStateAsync<Interfaces.Crew>("State");
             if (!state.HasValue)
-                await StateManager.AddStateAsync("State", new CrewState {LocationHistory = new List<LocationAtTime>()});
+                await StateManager.AddStateAsync("State", new Interfaces.Crew());
         }
 
-        public async Task<KeyValuePair<float, float>> GetLatestLocationAsync()
+        public async Task<CrewLocation> GetLatestLocationAsync()
         {
-            var state = await StateManager.GetStateAsync<CrewState>("State");
-            var location = state.LocationHistory.OrderByDescending(x => x.Timestamp)
-                .Select(x => new KeyValuePair<float, float>(x.Latitude, x.Longitude))
-                .FirstOrDefault();
-            return location;
+            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            return state.Location;
         }
 
         public async Task<DateTime?> GetLastReportTime()
         {
-            var state = await StateManager.GetStateAsync<CrewState>("State");
+            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
 
-            return state.LocationHistory.Last().Timestamp;
+            return state.Location.Timestamp;
         }
 
-        public async Task SetLocationAsync(DateTime timestamp, float latitude, float longitude)
+        public async Task CreateCrewAsync(Interfaces.Crew crew)
         {
-            var state = await StateManager.GetStateAsync<CrewState>("State");
-            state.LocationHistory.Add(new LocationAtTime()
-            {
-                Timestamp = timestamp,
-                Latitude = latitude,
-                Longitude = longitude
-            });
+            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            state.Name = crew.Name;
+            state.Status = crew.Status;
+            state.Location = crew.Location;
+            state.Members = crew.Members;
+            state.PlannedAssignments = crew.PlannedAssignments;
+            state.UnplannedAssignments = crew.UnplannedAssignments;
+            state.Vehicles = crew.Vehicles;
+            state.Companies = crew.Companies;
+
+            await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
+        }
+
+        public async Task<Interfaces.Crew> GetCrewByName()
+        {
+            var crew = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            return crew;
+        }
+
+        public async Task SetLocationAsync(CrewLocation location)
+        {
+            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            state.Location = location;
 
             await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
         }
