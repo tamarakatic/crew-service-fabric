@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Interfaces
 {
     public interface IAssignment
     {

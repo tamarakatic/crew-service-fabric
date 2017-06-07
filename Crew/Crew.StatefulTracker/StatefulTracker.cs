@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using Crew.CrewMemberActor.Interfaces;
+using Crew.CrewMemberActor.Interfaces.Models;
 using Crew.Tracker.Interfaces;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data;
@@ -11,14 +12,18 @@ using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
-using Crew = Crew.CrewMemberActor.Interfaces.Crew;
+using ICrewLocation = Crew.Tracker.Interfaces.ICrewLocation;
 
 namespace Crew.StatefulTracker
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class StatefulTracker : StatefulService, ILocationReporter, ILocationViewer, Tracker.Interfaces.ICrew
+    internal sealed class StatefulTracker : StatefulService, 
+                                            ICrewLocation,
+                                            Tracker.Interfaces.ICrew,
+                                            IMember,
+                                            IAssignment
     {
         public StatefulTracker(StatefulServiceContext context)
             : base(context)
@@ -62,7 +67,7 @@ namespace Crew.StatefulTracker
             }
         }
 
-        public async Task CreateCrew(CrewMemberActor.Interfaces.Crew crew)
+        public async Task CreateCrew(CrewMemberActor.Interfaces.Models.Crew crew)
         {
             using (var tx = StateManager.CreateTransaction())
             {
@@ -76,30 +81,30 @@ namespace Crew.StatefulTracker
                 await tx.CommitAsync();
             }
         }
-
-        public async Task ReportLocation(Location location)
+        
+        public async Task UpdateCrewLocation(String crewName, CrewLocation location)
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var timestamp = DateTime.UtcNow;
+                var actorDictionary = await StateManager
+                    .GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.TryGetValueAsync(tx, crewName);
 
-                var actorDictionary = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
-                var crewActorId = await actorDictionary.GetOrAddAsync(tx, location.CrewId, ActorId.CreateRandom());
-
-                await CrewConnectionFactory.GetCrewMemberActor(crewActorId)
-                    .SetLocationAsync(new CrewLocation(location.Longitude, location.Latitude, DateTime.Now)); 
+                await CrewConnectionFactory
+                    .GetCrewMemberActor(crewActorId.Value)
+                    .UpdateLocation(location); 
 
                 await tx.CommitAsync();
             }
         }
-
-        public async  Task<CrewMemberActor.Interfaces.Crew> GetCrewByName(string crewName)
+        
+        public async Task<CrewMemberActor.Interfaces.Models.Crew> GetCrewByName(string name)
         {
             using (var tx = StateManager.CreateTransaction())
             {
                 var actorDicitonary = await StateManager
                     .GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
-                var crewActorName = await actorDicitonary.TryGetValueAsync(tx, crewName);
+                var crewActorName = await actorDicitonary.TryGetValueAsync(tx, name);
 
                 if (!crewActorName.HasValue)
                     return null;
@@ -110,35 +115,66 @@ namespace Crew.StatefulTracker
             }
         }
 
-        public async Task<CrewLocation> GetLastCrewLocation(Guid crewIdGuid)
+        public async Task<CrewLocation> GetLastCrewLocation(String crewName)
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
+                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
 
-                var crewActorId = await actorDict.TryGetValueAsync(tx, crewIdGuid);
+                var crewActorId = await actorDict.TryGetValueAsync(tx, crewName);
                 if (!crewActorId.HasValue)
                     return null;
 
                 var crew = CrewConnectionFactory.GetCrewMemberActor(crewActorId.Value);
-                return await crew.GetLatestLocationAsync();
+                return await crew.GetLatestLocation();
             }
         }
 
-        public async Task<DateTime?> GetLastReportTime(Guid crewId)
+        public async Task CreateMember(String crewName, Member member)
         {
             using (var tx = StateManager.CreateTransaction())
             {
-                var actorDict = await StateManager.GetOrAddAsync<IReliableDictionary<Guid, ActorId>>("actorDict");
+                var actorDictionary =
+                    await StateManager.GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.TryGetValueAsync(tx, crewName);
 
-                var crewActorId = await actorDict.TryGetValueAsync(tx, crewId);
-                if (!crewActorId.HasValue)
-                    return null;
+                await CrewConnectionFactory
+                    .GetCrewMemberActor(crewActorId.Value)
+                    .CreateMember(member);
 
-                var crew = CrewConnectionFactory.GetCrewMemberActor(crewActorId.Value);
-                var timestamp = crew.GetLastReportTime();
+                await tx.CommitAsync();
+            }
+        }
 
-                return await timestamp;
+        public async Task AddPlannedAssignment(String crewName, Planned assignment)
+        {
+            using (var tx = StateManager.CreateTransaction())
+            {
+                var actorDictionary =
+                    await StateManager.GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.TryGetValueAsync(tx, crewName);
+
+                await CrewConnectionFactory
+                    .GetCrewMemberActor(crewActorId.Value)
+                    .AddPlannedAssignment(assignment);
+
+                await tx.CommitAsync();
+            }
+        }
+
+        public async Task AddUnplannedAssignment(String crewName, Unplanned assignment)
+        {
+            using (var tx = StateManager.CreateTransaction())
+            {
+                var actorDictionary =
+                    await StateManager.GetOrAddAsync<IReliableDictionary<String, ActorId>>("actorDict");
+                var crewActorId = await actorDictionary.TryGetValueAsync(tx, crewName);
+
+                await CrewConnectionFactory
+                    .GetCrewMemberActor(crewActorId.Value)
+                    .AddUnplannedAssignment(assignment);
+
+                await tx.CommitAsync();
             }
         }
     }

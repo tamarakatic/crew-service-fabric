@@ -8,19 +8,29 @@ namespace Crew.Tracker.Interfaces
     {
         private static readonly Uri LocationReporterServiceUrl = new Uri("fabric:/Crew/StatefulTracker");
 
-        public static ILocationReporter CreateLocationReporter()
+        public static ICrewLocation UpdateCrewLocation()
         {
-            return ServiceProxy.Create<ILocationReporter>(LocationReporterServiceUrl, new ServicePartitionKey(0));
+            return ServiceProxy.Create<ICrewLocation>(LocationReporterServiceUrl, new ServicePartitionKey(0));
         }
 
-        public static ILocationViewer CreateLocationViewer()
+        public static ICrewLocation GetLastCrewLocation()
         {
-            return ServiceProxy.Create<ILocationViewer>(LocationReporterServiceUrl, new ServicePartitionKey(0));
+            return ServiceProxy.Create<ICrewLocation>(LocationReporterServiceUrl, new ServicePartitionKey(0));
         }
 
         public static ICrew CreateCrew()
         {
             return ServiceProxy.Create<ICrew>(LocationReporterServiceUrl, new ServicePartitionKey(0));
+        }
+
+        public static IMember CreateMember()
+        {
+            return ServiceProxy.Create<IMember>(LocationReporterServiceUrl, new ServicePartitionKey(0));
+        }
+
+        public static IAssignment CreateAssignment()
+        {
+            return ServiceProxy.Create<IAssignment>(LocationReporterServiceUrl, new ServicePartitionKey(0));
         }
     }
 }

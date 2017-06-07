@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Crew.CrewMemberActor.Interfaces.Interfaces;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Models
 {
     [DataContract]
     public class Crew : ICrew
@@ -13,7 +13,6 @@ namespace Crew.CrewMemberActor.Interfaces
             this.PlannedAssignments = new List<Planned>();
             this.UnplannedAssignments = new List<Unplanned>();
             this.Vehicles = new List<Vehicle>();
-            this.Companies = new List<Company>();
         }
 
         [DataMember]
@@ -38,6 +37,6 @@ namespace Crew.CrewMemberActor.Interfaces
         public List<Vehicle> Vehicles { get; set; }
 
         [DataMember]
-        public List<Company> Companies { get; set; }
+        public Company Companies { get; set; }
     }
 }

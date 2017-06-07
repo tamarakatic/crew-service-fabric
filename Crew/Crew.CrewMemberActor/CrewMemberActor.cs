@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
-using Microsoft.ServiceFabric.Actors.Client;
 using Crew.CrewMemberActor.Interfaces;
-using Crew = Crew.CrewMemberActor.Interfaces.Crew;
+using Crew.CrewMemberActor.Interfaces.Models;
 
 namespace Crew.CrewMemberActor
 {
@@ -23,32 +17,6 @@ namespace Crew.CrewMemberActor
     [StatePersistence(StatePersistence.Persisted)]
     internal class CrewMemberActor : Actor, ICrewMemberActor
     {
-        //[DataContract]
-        //internal sealed class CrewState
-        //{
-        //    [DataMember]
-        //    public string Name { get; set; }
-
-        //    [DataMember]
-        //    public string Status { get; set; }
-
-        //    public CrewLocation Location { get; set; }
-
-        //    public List<Member> Members { get; set; }
-
-        //    public List<Assignment> Assignments { get; set; }
-
-        //    public List<Vehicle> Vehicles { get; set; }
-
-        //    public List<Company> Companies { get; set; }
-        //}
-
-        //[DataContract]
-        //internal sealed class CrewState
-        //{
-        //    [DataMember]
-        //    public List<LocationAtTime> LocationHistory { get; set; }
-        //}
         /// <summary>
         /// Initializes a new instance of CrewMemberActor
         /// </summary>
@@ -63,27 +31,44 @@ namespace Crew.CrewMemberActor
         {
             ActorEventSource.Current.ActorMessage(this, "Actor activated.");
 
-            var state = await StateManager.TryGetStateAsync<Interfaces.Crew>("State");
+            var state = await StateManager.TryGetStateAsync<Interfaces.Models.Crew>("State");
             if (!state.HasValue)
-                await StateManager.AddStateAsync("State", new Interfaces.Crew());
+                await StateManager.AddStateAsync("State", new Interfaces.Models.Crew());
         }
 
-        public async Task<CrewLocation> GetLatestLocationAsync()
+        public async Task<CrewLocation> GetLatestLocation()
         {
-            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
             return state.Location;
         }
 
-        public async Task<DateTime?> GetLastReportTime()
+        public async Task CreateMember(Member member)
         {
-            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
+            state.Members.Add(member);
 
-            return state.Location.Timestamp;
+            await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
         }
 
-        public async Task CreateCrewAsync(Interfaces.Crew crew)
+        public async Task AddPlannedAssignment(Planned assignment)
         {
-            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
+            state.PlannedAssignments.Add(assignment);
+
+            await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
+        }
+
+        public async Task AddUnplannedAssignment(Unplanned assignment)
+        {
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
+            state.UnplannedAssignments.Add(assignment);
+
+            await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
+        }
+
+        public async Task CreateCrewAsync(Interfaces.Models.Crew crew)
+        {
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
             state.Name = crew.Name;
             state.Status = crew.Status;
             state.Location = crew.Location;
@@ -96,16 +81,18 @@ namespace Crew.CrewMemberActor
             await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
         }
 
-        public async Task<Interfaces.Crew> GetCrewByName()
+        public async Task<Interfaces.Models.Crew> GetCrewByName()
         {
-            var crew = await StateManager.GetStateAsync<Interfaces.Crew>("State");
+            var crew = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
             return crew;
         }
 
-        public async Task SetLocationAsync(CrewLocation location)
+        public async Task UpdateLocation(CrewLocation location)
         {
-            var state = await StateManager.GetStateAsync<Interfaces.Crew>("State");
-            state.Location = location;
+            var state = await StateManager.GetStateAsync<Interfaces.Models.Crew>("State");
+            state.Location.Timestamp = location.Timestamp;
+            state.Location.Latitude = location.Latitude;
+            state.Location.Longitude = location.Longitude;
 
             await StateManager.AddOrUpdateStateAsync("State", state, (s, crewState) => state);
         }

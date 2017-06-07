@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Crew.CrewMemberActor.Interfaces.Interfaces;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Models
 {
     [DataContract]
     public class Planned : Assignment, IPlanned 

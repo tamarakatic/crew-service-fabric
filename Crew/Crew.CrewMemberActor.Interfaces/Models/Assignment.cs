@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Crew.CrewMemberActor.Interfaces.Interfaces;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Models
 {
     [DataContract]
     public abstract class Assignment : IAssignment

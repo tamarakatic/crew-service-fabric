@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Crew.CrewMemberActor.Interfaces.Models;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Interfaces
 {
     public interface ICrew
     {
@@ -12,6 +13,6 @@ namespace Crew.CrewMemberActor.Interfaces
         List<Planned> PlannedAssignments { get; set; }
         List<Unplanned> UnplannedAssignments { get; set; }
         List<Vehicle> Vehicles { get; set; }
-        List<Company> Companies { get; set; }
+        Company Companies { get; set; }
     }
 }

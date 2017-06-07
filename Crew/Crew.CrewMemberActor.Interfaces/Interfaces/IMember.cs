@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Crew.CrewMemberActor.Interfaces
+namespace Crew.CrewMemberActor.Interfaces.Interfaces
 {
     public interface IMember
     {
