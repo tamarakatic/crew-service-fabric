@@ -1,0 +1,412 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "v1",
+        "title": "Crew API"
+    },
+    "host": "localhost:8100",
+    "schemes": ["http"],
+    "paths": {
+        "/": {
+            "get": {
+                "tags": ["Crew"],
+                "operationId": "Crew_Index",
+                "consumes": [],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/add": {
+            "post": {
+                "tags": ["Crew"],
+                "operationId": "Crew_Add",
+                "consumes": ["application/json", "text/json", "text/html", "application/xml", "text/xml", "application/x-www-form-urlencoded"],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crew",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Crew"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/show": {
+            "get": {
+                "tags": ["Crew"],
+                "operationId": "Crew_Show",
+                "consumes": [],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/location": {
+            "post": {
+                "tags": ["Crew"],
+                "operationId": "Crew_Location",
+                "consumes": ["application/json", "text/json", "text/html", "application/xml", "text/xml", "application/x-www-form-urlencoded"],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "location",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/CrewLocation"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/lastlocation": {
+            "get": {
+                "tags": ["Crew"],
+                "operationId": "Crew_LastLocation",
+                "consumes": [],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/lastseen": {
+            "get": {
+                "tags": ["Crew"],
+                "operationId": "Crew_LastSeen",
+                "consumes": [],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "format": "date-time",
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/members": {
+            "post": {
+                "tags": ["Crew"],
+                "operationId": "Crew_AddMember",
+                "consumes": ["application/json", "text/json", "text/html", "application/xml", "text/xml", "application/x-www-form-urlencoded"],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "member",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Member"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/plannedassignment": {
+            "post": {
+                "tags": ["Crew"],
+                "operationId": "Crew_AddPlannedAssignment",
+                "consumes": ["application/json", "text/json", "text/html", "application/xml", "text/xml", "application/x-www-form-urlencoded"],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "assignment",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Planned"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/crew/{crewName}/unplannedassignment": {
+            "post": {
+                "tags": ["Crew"],
+                "operationId": "Crew_AddUnplannedAssignment",
+                "consumes": ["application/json", "text/json", "text/html", "application/xml", "text/xml", "application/x-www-form-urlencoded"],
+                "produces": ["application/json", "text/json", "text/html", "application/xml", "text/xml"],
+                "parameters": [{
+                    "name": "crewName",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }, {
+                    "name": "assignment",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/Unplanned"
+                    }
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Crew": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "Location": {
+                    "$ref": "#/definitions/CrewLocation"
+                },
+                "Members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Member"
+                    }
+                },
+                "PlannedAssignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Planned"
+                    }
+                },
+                "UnplannedAssignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Unplanned"
+                    }
+                },
+                "Vehicles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Vehicle"
+                    }
+                },
+                "Companies": {
+                    "$ref": "#/definitions/Company"
+                }
+            }
+        },
+        "CrewLocation": {
+            "type": "object",
+            "properties": {
+                "Timestamp": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "Latitude": {
+                    "format": "float",
+                    "type": "number"
+                },
+                "Longitude": {
+                    "format": "float",
+                    "type": "number"
+                }
+            }
+        },
+        "Member": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Telephone": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "IsLead": {
+                    "type": "boolean"
+                },
+                "IsDriver": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "Planned": {
+            "type": "object",
+            "properties": {
+                "From": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "To": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "IsPriority": {
+                    "type": "boolean"
+                },
+                "AffectedCustomers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "AssignmentType": {
+                    "format": "int32",
+                    "enum": [0, 1, 2],
+                    "type": "integer"
+                }
+            }
+        },
+        "Unplanned": {
+            "type": "object",
+            "properties": {
+                "Problem": {
+                    "type": "string"
+                },
+                "Comment": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "IsPriority": {
+                    "type": "boolean"
+                },
+                "AffectedCustomers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "AssignmentType": {
+                    "format": "int32",
+                    "enum": [0, 1, 2],
+                    "type": "integer"
+                }
+            }
+        },
+        "Vehicle": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Status": {
+                    "type": "string"
+                },
+                "VehicleType": {
+                    "format": "int32",
+                    "enum": [0, 1, 2],
+                    "type": "integer"
+                }
+            }
+        },
+        "Company": {
+            "type": "object",
+            "properties": {
+                "Name": {
+                    "type": "string"
+                },
+                "Address": {
+                    "type": "string"
+                },
+                "Telephone": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "CompanyType": {
+                    "format": "int32",
+                    "enum": [0, 1],
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

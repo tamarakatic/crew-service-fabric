@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Web.Http;
 using Owin;
+using Swashbuckle.Application;
 
 namespace Crew.WebService
 {
@@ -14,6 +15,10 @@ namespace Crew.WebService
                   .JsonFormatter
                   .SupportedMediaTypes
                   .Add(new MediaTypeHeaderValue("text/html"));
+
+            config
+                .EnableSwagger(c => c.SingleApiVersion("v1", "Crew API"))
+                .EnableSwaggerUi();
 
             appBuilder.UseWebApi(config);
         }
